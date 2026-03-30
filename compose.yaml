@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      PYTHONPATH: /app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    working_dir: /app
+
+  test:
+    build: .
+    command: uv run pytest
+    environment:
+      PYTHONPATH: /app
+    volumes:
+      - .:/app
+    working_dir: /app

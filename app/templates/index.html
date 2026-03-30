@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>webOS Subscriber Control Center</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="/static/app.js"></script>
+</head>
+<body>
+    <div class="background-orb orb-left"></div>
+    <div class="background-orb orb-right"></div>
+
+    <header class="hero">
+        <div class="hero-copy">
+            <span class="eyebrow">DevOps Practice Dashboard</span>
+            <h1>webOS Subscriber Control Center</h1>
+            <p>
+                구독 사용자, 연결 가전, 상세 사용 현황을 한 화면에서 확인하고 QA 흐름까지 빠르게 검증할 수 있는
+                운영 대시보드입니다.
+            </p>
+            <div class="hero-tags">
+                <span class="hero-tag"><i data-lucide="shield-check"></i> QA Ready</span>
+                <span class="hero-tag"><i data-lucide="sparkles"></i> Toss Style UI</span>
+                <span class="hero-tag"><i data-lucide="workflow"></i> CI/CD Connected</span>
+            </div>
+        </div>
+
+        <div class="hero-card">
+            <div class="hero-card-title">
+                <i data-lucide="activity"></i>
+                <span>운영 포인트</span>
+            </div>
+            <ul class="hero-list">
+                <li>초기 진입 시 구독자 목록 자동 조회</li>
+                <li>실시간 검색 및 상태 필터링</li>
+                <li>사용자별 가전 조회와 상세 사용 차트 제공</li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="summary-grid">
+            <article class="summary-card">
+                <div class="summary-icon blue"><i data-lucide="users"></i></div>
+                <div>
+                    <p class="summary-label">전체 구독자</p>
+                    <strong id="summary-total">0</strong>
+                </div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-icon green"><i data-lucide="badge-check"></i></div>
+                <div>
+                    <p class="summary-label">활성 구독</p>
+                    <strong id="summary-active">0</strong>
+                </div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-icon sky"><i data-lucide="pause-circle"></i></div>
+                <div>
+                    <p class="summary-label">일시정지/만료</p>
+                    <strong id="summary-inactive">0</strong>
+                </div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-icon amber"><i data-lucide="monitor-smartphone"></i></div>
+                <div>
+                    <p class="summary-label">등록 가전 수</p>
+                    <strong id="summary-devices">0</strong>
+                </div>
+            </article>
+        </section>
+
+        <section class="workspace-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-eyebrow">Requirement 1</p>
+                        <h2>Subscribers</h2>
+                    </div>
+                    <div class="toolbar">
+                        <label class="field">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="subscriber-search" placeholder="Search name, plan, status, ID" />
+                        </label>
+                        <label class="field select-field">
+                            <i data-lucide="filter"></i>
+                            <select id="subscriber-status-filter">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Paused">Paused</option>
+                                <option value="Expired">Expired</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="subscriber-empty" class="empty-state hidden">구독자 정보를 불러오는 중입니다.</div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Devices</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscriber-body"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-eyebrow">Requirement 2</p>
+                        <h2>Devices</h2>
+                    </div>
+                    <div class="toolbar">
+                        <label class="field">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="device-search" placeholder="Search model, type, location, ID" />
+                        </label>
+                        <label class="field select-field">
+                            <i data-lucide="sliders-horizontal"></i>
+                            <select id="device-status-filter">
+                                <option value="">All Status</option>
+                                <option value="Online">Online</option>
+                                <option value="Offline">Offline</option>
+                                <option value="Standby">Standby</option>
+                                <option value="Error">Error</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="device-empty" class="empty-state">구독자를 선택하면 가전 목록이 표시됩니다.</div>
+
+                <div class="table-wrap">
+                    <table id="device-table" class="hidden">
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="device-body"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel usage-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-eyebrow">Requirement 2-C</p>
+                        <h2>Usage Insight</h2>
+                    </div>
+                </div>
+
+                <div id="usage-empty" class="empty-state">가전을 선택하면 상세 사용 현황과 주간 Bar Chart가 표시됩니다.</div>
+
+                <div id="usage-detail" class="usage-detail hidden">
+                    <section id="usage-highlight" class="usage-highlight"></section>
+                    <div class="detail-grid" id="usage-info"></div>
+                    <section class="chart-shell">
+                        <div class="chart-header">
+                            <h3>Weekly Usage Trend</h3>
+                            <span>최근 7일 사용량</span>
+                        </div>
+                        <canvas id="usageChart"></canvas>
+                    </section>
+                </div>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

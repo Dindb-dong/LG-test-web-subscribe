@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: webos-subscription-dashboard
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: checksPass
+    healthCheckPath: /health

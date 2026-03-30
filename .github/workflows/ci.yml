@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker services
+        run: docker compose build
+
+      - name: Check formatting
+        run: docker compose run --rm app uv run ruff format --check .
+
+      - name: Run lint checks
+        run: docker compose run --rm app uv run ruff check .
+
+      - name: Run pytest suite
+        run: docker compose run --rm test
+
+      - name: Start application
+        run: docker compose up -d app
+
+      - name: Wait for health endpoint
+        run: |
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8000/health; then
+              exit 0
+            fi
+            sleep 3
+          done
+          exit 1
+
+      - name: Verify core API endpoints
+        run: |
+          curl --fail --silent http://127.0.0.1:8000/api/v1/subscribers
+          curl --fail --silent http://127.0.0.1:8000/api/v1/subscribers/U001/devices
+          curl --fail --silent http://127.0.0.1:8000/api/v1/devices/D001/usage
+
+      - name: Stop Docker services
+        if: always()
+        run: docker compose down --remove-orphans
