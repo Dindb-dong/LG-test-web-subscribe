@@ -7,6 +7,7 @@ Date: 2026-03-30
 - 프론트는 토스 스타일의 단일 페이지 대시보드로 재구성되었고, Lucide 아이콘과 주간 사용량 Bar Chart를 포함합니다.
 - GitHub Actions 기반 CI와 Render 배포용 설정 파일이 추가되어 요구사항 3의 자동 검증 및 CD 준비 상태를 갖췄습니다.
 - 주간 사용량 차트는 고정 높이 컨테이너와 무애니메이션 설정으로 안정화되어 과도한 세로 확장과 렌더링 지연을 줄였습니다.
+- GitHub Actions는 `CI`와 `CD Render Verify`로 분리되어, `main` 브랜치 CI 성공 후 실제 Render 배포 URL에서 헬스 체크와 핵심 API를 검증합니다.
 
 ## Current Behavior
 1. `/` 진입 시 구독자 목록을 `/api/v1/subscribers`에서 자동 조회합니다.
@@ -25,7 +26,8 @@ Date: 2026-03-30
 ## Operational Notes
 1. Docker 실행 기준 파일은 `compose.yaml`, `Dockerfile`, `pyproject.toml`입니다.
 2. CI는 `.github/workflows/ci.yml`에서 `docker compose build`, `ruff`, `pytest`, `health`, 주요 API 확인 순으로 검증합니다.
-3. Render 배포는 `render.yaml`과 `/health` 헬스체크를 기준으로 연결되도록 준비했습니다.
+3. CD는 `.github/workflows/cd-render.yml`에서 `https://lg-test-web-subscribe.onrender.com` 배포본의 `/health`와 핵심 API를 검증합니다.
+4. Render 배포는 `render.yaml`의 `autoDeployTrigger: checksPass`와 `/health` 헬스체크를 기준으로 연결되도록 준비했습니다.
 
 ## Limitations And Follow-Up
 1. 현재 데이터는 `app/data/dummy_data.py`의 메모리 기반 더미 데이터이며 실제 DB 연동은 아직 없습니다.
