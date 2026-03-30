@@ -396,6 +396,8 @@ function renderUsageChart(trend) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            resizeDelay: 150,
+            animation: false,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -415,6 +417,9 @@ function renderUsageChart(trend) {
             plugins: {
                 legend: {
                     display: false,
+                },
+                tooltip: {
+                    animation: false,
                 },
             },
         },

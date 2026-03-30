@@ -19,6 +19,7 @@ async def test_root_returns_dashboard_shell(client) -> None:
     assert "webOS Subscriber Control Center" in response.text
     assert "Requirement 2-C" in response.text
     assert 'id="subscriber-search"' in response.text
+    assert 'class="chart-canvas-wrap"' in response.text
     assert "lucide" in response.text
 
 
